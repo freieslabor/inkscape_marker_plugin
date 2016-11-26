@@ -80,18 +80,12 @@ Changelog 2010-04-20:
 
 import inkex
 import simplestyle
-import simplepath
 import cubicsuperpath
 import simpletransform
 import bezmisc
 
 import os
 import math
-import bezmisc
-import re
-import copy
-import sys
-import time
 _ = inkex._
 
 
@@ -280,7 +274,6 @@ def between(c, x, y):
 
 def distance_from_point_to_arc(p, arc):
     P0, P2, c, a = arc
-    dist = None
     p = P(p)
     r = (P0-c).mag()
     if r > 0:
@@ -350,7 +343,6 @@ def biarc(sp1, sp2, z1, z2, depth=0,):
     v = P0 - P4
     tsa = TS.angle()
     tea = TE.angle()
-    va = v.angle()
 
     if TE.mag() < STRAIGHT_DISTANCE_TOLERANCE and \
             TS.mag() < STRAIGHT_DISTANCE_TOLERANCE:
