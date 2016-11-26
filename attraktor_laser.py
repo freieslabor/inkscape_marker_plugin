@@ -86,7 +86,6 @@ import bezmisc
 
 import os
 import math
-_ = inkex._
 
 
 # Constants
@@ -707,7 +706,7 @@ class Gcode_tools(inkex.Effect):
             else:
                 self.footer = FOOTER_TEXT
         else:
-            inkex.errormsg(_("Directory does not exist!"))
+            inkex.errormsg("Directory does not exist!")
             return
 
     def make_args(self, c):
@@ -995,13 +994,13 @@ class Gcode_tools(inkex.Effect):
         selected = self.selected.values()
 
         root = self.document.getroot()
-        self.pageHeight = float(root.get("height", None))
+        self.pageHeight = float(root.get("height", None)[:-2])
         self.flipArcs = (self.options.Xscale * self.options.Yscale < 0)
         self.currentTool = 0
 
         self.filename = options.file.strip()
         if (self.filename == "-1.0" or self.filename == ""):
-            inkex.errormsg(_("Please select an output file name."))
+            inkex.errormsg("Please select an output file name.")
             return
 
         if (not self.filename.lower().endswith(GCODE_EXTENSION)):
@@ -1013,8 +1012,8 @@ class Gcode_tools(inkex.Effect):
         logger.write("output file == %s" % self.options.file)
 
         if len(selected) <= 0:
-            inkex.errormsg(_(
-                "This extension requires at least one selected path."))
+            inkex.errormsg(
+                "This extension requires at least one selected path.")
             return
 
         self.check_dir()
@@ -1055,13 +1054,13 @@ class Gcode_tools(inkex.Effect):
             f.write(gcode + self.footer)
             f.close()
         except:
-            inkex.errormsg(_("Can not write to specified file!"))
+            inkex.errormsg("Can not write to specified file!")
             return
 
         if (self.skipped > 0):
-            inkex.errormsg(_(
+            inkex.errormsg(
                 "Warning: skipped %d object(s) because they were not paths"
-                % self.skipped))
+                % self.skipped)
 
 e = Gcode_tools()
 e.affect()
