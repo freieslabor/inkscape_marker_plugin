@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 
 """
 think|haus gcode inkscape extension
@@ -10,7 +10,7 @@ Based on a script by Nick Drobchenko from the CNC club and Peter Rogers at think
 ***
 
 Copyright (C) 2009 Nick Drobchenko, nick@cnc-club.ru
-based on gcode.py (C) 2007 hugomatic... 
+based on gcode.py (C) 2007 hugomatic...
 based on addnodes.py (C) 2005,2007 Aaron Spike, aaron@ekips.org
 based on dots.py (C) 2005 Aaron Spike, aaron@ekips.org
 based on interp.py (C) 2005 Aaron Spike, aaron@ekips.org
@@ -68,7 +68,7 @@ Changelog 2011-02-20 - Adina:
 
 Changelog 2010-04-07 - Adina:
 * separate scaling factor for x and y,
-* x and y scaled to mm or inches that match the dimensions in inkscape (not 1px = 1 in or mm) 
+* x and y scaled to mm or inches that match the dimensions in inkscape (not 1px = 1 in or mm)
 
 Changelog 2010-04-20:
 * made the .inx file refer to the correct .py file... it should work now?
@@ -190,7 +190,7 @@ class P:
     def angle(self): return math.atan2(self.y, self.x)
     def __repr__(self): return '%f,%f' % (self.x, self.y)
     def pr(self): return "%.2f,%.2f" % (self.x, self.y)
-    def to_list(self): return [self.x, self.y]    
+    def to_list(self): return [self.x, self.y]
 
 
 ###
@@ -204,15 +204,15 @@ def csp_at_t(sp1,sp2,t):
 def cspbezsplit(sp1, sp2, t = 0.5):
     s1,s2 = bezmisc.beziersplitatt((sp1[1],sp1[2],sp2[0],sp2[1]),t)
     return [ [sp1[0][:], sp1[1][:], list(s1[1])], [list(s1[2]), list(s1[3]), list(s2[1])], [list(s2[2]), sp2[1][:], sp2[2][:]] ]
-    
+
 def cspbezsplitatlength(sp1, sp2, l = 0.5, tolerance = 0.01):
     bez = (sp1[1][:],sp1[2][:],sp2[0][:],sp2[1][:])
     t = bezmisc.beziertatlength(bez, l, tolerance)
-    return cspbezsplit(sp1, sp2, t)    
-    
+    return cspbezsplit(sp1, sp2, t)
+
 def cspseglength(sp1,sp2, tolerance = 0.001):
     bez = (sp1[1][:],sp1[2][:],sp2[0][:],sp2[1][:])
-    return bezmisc.bezierlength(bez, tolerance)    
+    return bezmisc.bezierlength(bez, tolerance)
 
 def csplength(csp):
     total = 0
@@ -221,7 +221,7 @@ def csplength(csp):
         for i in xrange(1,len(sp)):
             l = cspseglength(sp[i-1],sp[i])
             lengths.append(l)
-            total += l            
+            total += l
     return lengths, total
 
 
@@ -240,14 +240,14 @@ def distance_from_point_to_arc(p, arc):
     if r>0 :
         i = c + (p-c).unit()*r
         alpha = ((i-c).angle() - (P0-c).angle())
-        if a*alpha<0: 
+        if a*alpha<0:
             if alpha>0:    alpha = alpha-2*math.pi
             else: alpha = 2*math.pi+alpha
-        if between(alpha,0,a) or min(abs(alpha),abs(alpha-a))<STRAIGHT_TOLERANCE : 
+        if between(alpha,0,a) or min(abs(alpha),abs(alpha-a))<STRAIGHT_TOLERANCE :
             return (p-i).mag(), [i.x, i.y]
-        else : 
+        else :
             d1, d2 = (p-P0).mag(), (p-P2).mag()
-            if d1<d2 : 
+            if d1<d2 :
                 return (d1, [P0.x,P0.y])
             else :
                 return (d2, [P2.x,P2.y])
@@ -257,10 +257,10 @@ def get_distance_from_csp_to_arc(sp1,sp2, arc1, arc2, tolerance = 0.001 ): # arc
     d, d1, dl = (0,(0,0)), (0,(0,0)), 0
     while i<1 or (abs(d1[0]-dl[0])>tolerance and i<2):
         i += 1
-        dl = d1*1    
+        dl = d1*1
         for j in range(n+1):
             t = float(j)/n
-            p = csp_at_t(sp1,sp2,t) 
+            p = csp_at_t(sp1,sp2,t)
             d = min(distance_from_point_to_arc(p,arc1), distance_from_point_to_arc(p,arc2))
             d1 = max(d1,d)
         n=n*2
@@ -277,7 +277,7 @@ def get_distance_from_csp_to_arc(sp1,sp2, arc1, arc2, tolerance = 0.001 ): # arc
 
 
 def biarc(sp1, sp2, z1, z2, depth=0,):
-    def biarc_split(sp1,sp2, z1, z2, depth): 
+    def biarc_split(sp1,sp2, z1, z2, depth):
         if depth<options.biarc_max_split_depth:
             sp1,sp2,sp3 = cspbezsplit(sp1,sp2)
             l1, l2 = cspseglength(sp1,sp2), cspseglength(sp2,sp3)
@@ -289,7 +289,7 @@ def biarc(sp1, sp2, z1, z2, depth=0,):
     P0, P4 = P(sp1[1]), P(sp2[1])
     TS, TE, v = (P(sp1[2])-P0), -(P(sp2[0])-P4), P0 - P4
     tsa, tea, va = TS.angle(), TE.angle(), v.angle()
-    if TE.mag()<STRAIGHT_DISTANCE_TOLERANCE and TS.mag()<STRAIGHT_DISTANCE_TOLERANCE:    
+    if TE.mag()<STRAIGHT_DISTANCE_TOLERANCE and TS.mag()<STRAIGHT_DISTANCE_TOLERANCE:
         # Both tangents are zerro - line straight
         return [ [sp1[1],'line', 0, 0, sp2[1], [z1,z2]] ]
     if TE.mag() < STRAIGHT_DISTANCE_TOLERANCE:
@@ -298,11 +298,11 @@ def biarc(sp1, sp2, z1, z2, depth=0,):
     elif TS.mag() < STRAIGHT_DISTANCE_TOLERANCE:
         TS = -(TE+v).unit()
         r = 1/( TE.mag()/v.mag()*2 )
-    else:    
+    else:
         r=TS.mag()/TE.mag()
     TS, TE = TS.unit(), TE.unit()
     tang_are_parallel = ((tsa-tea)%math.pi<STRAIGHT_TOLERANCE or math.pi-(tsa-tea)%math.pi<STRAIGHT_TOLERANCE )
-    if ( tang_are_parallel  and 
+    if ( tang_are_parallel  and
                 ((v.mag()<STRAIGHT_DISTANCE_TOLERANCE or TE.mag()<STRAIGHT_DISTANCE_TOLERANCE or TS.mag()<STRAIGHT_DISTANCE_TOLERANCE) or
                     1-abs(TS*v/(TS.mag()*v.mag()))<STRAIGHT_TOLERANCE)    ):
                 # Both tangents are parallel and start and end are the same - line straight
@@ -314,10 +314,10 @@ def biarc(sp1, sp2, z1, z2, depth=0,):
     c,b,a = v*v, 2*v*(r*TS+TE), 2*r*(TS*TE-1)
     if v.mag()==0:
         return biarc_split(sp1, sp2, z1, z2, depth)
-    asmall, bsmall, csmall = abs(a)<10**-10,abs(b)<10**-10,abs(c)<10**-10 
+    asmall, bsmall, csmall = abs(a)<10**-10,abs(b)<10**-10,abs(c)<10**-10
     if         asmall and b!=0:    beta = -c/b
-    elif     csmall and a!=0:    beta = -b/a 
-    elif not asmall:     
+    elif     csmall and a!=0:    beta = -b/a
+    elif not asmall:
         discr = b*b-4*a*c
         if discr < 0:    raise ValueError, (a,b,c,discr)
         disq = discr**.5
@@ -325,10 +325,10 @@ def biarc(sp1, sp2, z1, z2, depth=0,):
         beta2 = (-b + disq) / 2 / a
         if beta1*beta2 > 0 :    raise ValueError, (a,b,c,disq,beta1,beta2)
         beta = max(beta1, beta2)
-    elif    asmall and bsmall:    
+    elif    asmall and bsmall:
         return biarc_split(sp1, sp2, z1, z2, depth)
     alpha = beta * r
-    ab = alpha + beta 
+    ab = alpha + beta
     P1 = P0 + alpha * TS
     P3 = P4 - beta * TE
     P2 = (beta / ab)  * P1 + (alpha / ab) * P3
@@ -338,22 +338,22 @@ def biarc(sp1, sp2, z1, z2, depth=0,):
         if (D-P1).mag()==0: return None, None
         R = D - ( (D-P0).mag()**2/(D-P1).mag() )*(P1-D).unit()
         p0a, p1a, p2a = (P0-R).angle()%(2*math.pi), (P1-R).angle()%(2*math.pi), (P2-R).angle()%(2*math.pi)
-        alpha =  (p2a - p0a) % (2*math.pi)                    
-        if (p0a<p2a and  (p1a<p0a or p2a<p1a))    or    (p2a<p1a<p0a) : 
-            alpha = -2*math.pi+alpha 
+        alpha =  (p2a - p0a) % (2*math.pi)
+        if (p0a<p2a and  (p1a<p0a or p2a<p1a))    or    (p2a<p1a<p0a) :
+            alpha = -2*math.pi+alpha
         if abs(R.x)>1000000 or abs(R.y)>1000000  or (R-P0).mag<options.min_arc_radius :
             return None, None
-        else :    
+        else :
             return  R, alpha
     R1,a1 = calculate_arc_params(P0,P1,P2)
     R2,a2 = calculate_arc_params(P2,P3,P4)
     if R1==None or R2==None or (R1-P0).mag()<STRAIGHT_TOLERANCE or (R2-P2).mag()<STRAIGHT_TOLERANCE    : return [ [sp1[1],'line', 0, 0, sp2[1], [z1,z2]] ]
-    
+
     d = get_distance_from_csp_to_arc(sp1,sp2, [P0,P2,R1,a1],[P2,P4,R2,a2])
     if d > options.biarc_tolerance and depth<options.biarc_max_split_depth     : return biarc_split(sp1, sp2, z1, z2, depth)
     else:
         if R2.mag()*a2 == 0 : zm = z2
-        else : zm  = z1 + (z2-z1)*(R1.mag()*a1)/(R2.mag()*a2+R1.mag()*a1)  
+        else : zm  = z1 + (z2-z1)*(R1.mag()*a1)/(R2.mag()*a2+R1.mag()*a1)
         return [    [ sp1[1], 'arc', [R1.x,R1.y], a1, [P2.x,P2.y], [z1,zm] ], [ [P2.x,P2.y], 'arc', [R2.x,R2.y], a2, [P4.x,P4.y], [zm,z2] ]        ]
 
 
@@ -387,7 +387,7 @@ def parse_layer_name(txt):
     else:
         layerName = txt[0:n].strip()
         args = txt[n+1:].strip()
-        if (args.endswith("]")): 
+        if (args.endswith("]")):
             args = args[0:-1]
 
         for arg in args.split(","):
@@ -426,29 +426,29 @@ class Gcode_tools(inkex.Effect):
             outdir = os.getcwd()
 
         self.OptionParser.add_option("-d", "--directory",                action="store", type="string",         dest="directory", default=outdir,                help="Directory for gcode file")
-        self.OptionParser.add_option("-f", "--filename",                action="store", type="string",         dest="file", default="-1.0",                    help="File name")            
-        self.OptionParser.add_option("-u", "--Xscale",                    action="store", type="float",         dest="Xscale", default="1.0",                    help="Scale factor X")    
+        self.OptionParser.add_option("-f", "--filename",                action="store", type="string",         dest="file", default="-1.0",                    help="File name")
+        self.OptionParser.add_option("-u", "--Xscale",                    action="store", type="float",         dest="Xscale", default="1.0",                    help="Scale factor X")
         self.OptionParser.add_option("-v", "--Yscale",                    action="store", type="float",         dest="Yscale", default="1.0",                    help="Scale factor Y")
-        self.OptionParser.add_option("-x", "--Xoffset",                    action="store", type="float",         dest="Xoffset", default="0.0",                    help="Offset along X")    
+        self.OptionParser.add_option("-x", "--Xoffset",                    action="store", type="float",         dest="Xoffset", default="0.0",                    help="Offset along X")
         self.OptionParser.add_option("-y", "--Yoffset",                    action="store", type="float",         dest="Yoffset", default="0.0",                    help="Offset along Y")
         self.OptionParser.add_option("-p", "--feed",                    action="store", type="float",         dest="feed", default="4.0",                        help="Feed rate in unit/min")
 
-        self.OptionParser.add_option("",   "--biarc-tolerance",            action="store", type="float",         dest="biarc_tolerance", default="1",        help="Tolerance used when calculating biarc interpolation.")                
-        self.OptionParser.add_option("",   "--biarc-max-split-depth",    action="store", type="int",         dest="biarc_max_split_depth", default="4",        help="Defines maximum depth of splitting while approximating using biarcs.")                
+        self.OptionParser.add_option("",   "--biarc-tolerance",            action="store", type="float",         dest="biarc_tolerance", default="1",        help="Tolerance used when calculating biarc interpolation.")
+        self.OptionParser.add_option("",   "--biarc-max-split-depth",    action="store", type="int",         dest="biarc_max_split_depth", default="4",        help="Defines maximum depth of splitting while approximating using biarcs.")
 
         self.OptionParser.add_option("",   "--unit",                    action="store", type="string",         dest="unit", default="G21 (All units in mm)\n",    help="Units")
         self.OptionParser.add_option("",   "--function",                action="store", type="string",         dest="function", default="Curve",                help="What to do: Curve|Area|Area inkscape")
         self.OptionParser.add_option("",   "--tab",                        action="store", type="string",         dest="tab", default="",                            help="Means nothing right now. Notebooks Tab.")
-        self.OptionParser.add_option("",   "--generate_not_parametric_code",action="store", type="inkbool",    dest="generate_not_parametric_code", default=False,help="Generated code will be not parametric.")        
+        self.OptionParser.add_option("",   "--generate_not_parametric_code",action="store", type="inkbool",    dest="generate_not_parametric_code", default=False,help="Generated code will be not parametric.")
         self.OptionParser.add_option("",   "--double_sided_cutting",action="store", type="inkbool",    dest="double_sided_cutting", default=False,help="Generate code for double-sided cutting.")
-        self.OptionParser.add_option("",   "--draw-curves",                action="store", type="inkbool",    dest="drawCurves", default=False,help="Draws curves to show what geometry was processed")        
+        self.OptionParser.add_option("",   "--draw-curves",                action="store", type="inkbool",    dest="drawCurves", default=False,help="Draws curves to show what geometry was processed")
         self.OptionParser.add_option("",   "--logging",                 action="store", type="inkbool",    dest="logging", default=False, help="Enable output logging from the plugin")
 
         self.OptionParser.add_option("",   "--loft-distances",            action="store", type="string",         dest="loft_distances", default="10",            help="Distances between paths.")
         self.OptionParser.add_option("",   "--loft-direction",            action="store", type="string",         dest="loft_direction", default="crosswise",        help="Direction of loft's interpolation.")
         self.OptionParser.add_option("",   "--loft-interpolation-degree",action="store", type="float",        dest="loft_interpolation_degree", default="2",    help="Which interpolation use to loft the paths smooth interpolation or staright.")
 
-        self.OptionParser.add_option("",   "--min-arc-radius",            action="store", type="float",         dest="min_arc_radius", default=".1",            help="All arc having radius less than minimum will be considered as straight line")        
+        self.OptionParser.add_option("",   "--min-arc-radius",            action="store", type="float",         dest="min_arc_radius", default=".1",            help="All arc having radius less than minimum will be considered as straight line")
 
     def parse_curve(self, path):
 #        if self.options.Xscale!=self.options.Yscale:
@@ -457,7 +457,7 @@ class Gcode_tools(inkex.Effect):
 #        else :
         xs,ys = 1.0,1.0
 
-#            ### Sort to reduce Rapid distance    
+#            ### Sort to reduce Rapid distance
 #            np = [p[0]]
 #            del p[0]
 #            while len(p)>0:
@@ -465,11 +465,11 @@ class Gcode_tools(inkex.Effect):
 #                dist = None
 #                for i in range(len(p)):
 #                    start = p[i][0][1]
-#    
+#
 #                    dist = max(   ( -( ( end[0]-start[0])**2+(end[1]-start[1])**2 ) ,i)    ,   dist )
 #                np += [p[dist[1]][:]]
 #                del p[dist[1]]
-#            p = np[:]        
+#            p = np[:]
 
         lst = []
         for subpath in path:
@@ -494,7 +494,7 @@ class Gcode_tools(inkex.Effect):
         for si in curve:
             if s!='':
                 if s[1] == 'line':
-                    inkex.etree.SubElement(    group, SVG_PATH_TAG, 
+                    inkex.etree.SubElement(    group, SVG_PATH_TAG,
                             {
                                 'style': style['line'],
                                 'd':'M %s,%s L %s,%s' % (s[0][0], s[0][1], si[0][0], si[0][1]),
@@ -506,17 +506,17 @@ class Gcode_tools(inkex.Effect):
                     sp = s[0]
                     c = s[2]
                     a =  ( (P(si[0])-P(c)).angle() - (P(s[0])-P(c)).angle() )%(2*math.pi) #s[3]
-                    if s[3]*a<0: 
+                    if s[3]*a<0:
                             if a>0:    a = a-2*math.pi
                             else: a = 2*math.pi+a
                     r = math.sqrt( (sp[0]-c[0])**2 + (sp[1]-c[1])**2 )
                     a_st = ( math.atan2(sp[0]-c[0],- (sp[1]-c[1])) - math.pi/2 ) % (math.pi*2)
                     if a>0:
                         a_end = a_st+a
-                    else: 
+                    else:
                         a_end = a_st*1
-                        a_st = a_st+a    
-                    inkex.etree.SubElement(    group, inkex.addNS('path','svg'), 
+                        a_st = a_st+a
+                    inkex.etree.SubElement(    group, inkex.addNS('path','svg'),
                          {
                             'style': style['biarc%s' % (arcn%2)],
                              inkex.addNS('cx','sodipodi'):        str(c[0]),
@@ -530,7 +530,7 @@ class Gcode_tools(inkex.Effect):
                             'comment': str(s)
                         })
             s = si
-    
+
 
     def check_dir(self):
         if (os.path.isdir(self.options.directory)):
@@ -557,7 +557,7 @@ class Gcode_tools(inkex.Effect):
         if c[5] == 0:
             c[5] = None
         # next few lines generate the stuff at the front of the file - scaling, offsets, etc (adina)
-        if self.options.generate_not_parametric_code: 
+        if self.options.generate_not_parametric_code:
             s = ["X", "Y", "Z", "I", "J", "K"]
             s1 = ["","","","","",""]
 
@@ -580,7 +580,7 @@ class Gcode_tools(inkex.Effect):
                 value = self.unitScale*(c[i]*m[i]+a[i])
                 args.append(s[i] + ("%f" % value) + s1[i])
         return " ".join(args)
-    
+
     def generate_gcode(self, curve, depth, altfeed=None):
         gcode = ''
         if (altfeed):
@@ -618,7 +618,7 @@ class Gcode_tools(inkex.Effect):
                 lg = 'G00'
 
             elif s[1] == 'line':
-                if lg=="G00": 
+                if lg=="G00":
                     #gcode += "G01 " + self.make_args([None,None,s[5][0]+depth]) + feed +"\n" + LASER_ON
                     gcode += LASER_ON
                 gcode += "G01 " +self.make_args(si[0]) + feed + "\n"
@@ -651,7 +651,7 @@ class Gcode_tools(inkex.Effect):
 
                     lg = cwArc
                 else:
-                    if lg=="G00": 
+                    if lg=="G00":
                         #gcode += "G01 " + self.make_args([None,None,s[5][0]+depth]) + feed +"\n" + LASER_ON
                         gcode += LASER_ON
                     gcode += "G01 " +self.make_args(si[0]) + feed + "\n"
@@ -710,7 +710,7 @@ class Gcode_tools(inkex.Effect):
             return []
 
         # Compile a list of layers in this document. We compile a list of only the layers
-        # we need to use, so we can know ahead of time whether to put tool change 
+        # we need to use, so we can know ahead of time whether to put tool change
         # operations between them.
         layers = []
         for layer in reversed(get_layers(self.document)):
@@ -867,9 +867,9 @@ class Gcode_tools(inkex.Effect):
             gcode += self.effect_curve(selected)
 
         try:
-            f = open(self.options.directory+'/'+self.options.file, "w")    
+            f = open(self.options.directory+'/'+self.options.file, "w")
             f.write(gcode + self.footer)
-            f.close()                            
+            f.close()
         except:
             inkex.errormsg(_("Can not write to specified file!"))
             return
