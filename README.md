@@ -1,15 +1,47 @@
-Inkscape Laserplugin
-====================
+Inkscape Marker Plugin
+======================
 
-An inkscape plugin for creating gcode for the laser cutter in the attraktor makerspace.
-Based on the work of the thinkhaus hackerspace (http://wiki.thinkhaus.org/index.php?title=THLaser_Plugin).
+An inkscape plugin for creating gcode for our
+[Borries 320-DP marker](https://wiki.freieslabor.org/wiki/Borries-Markierer).
 
-Put the attraktor_laser.py and attraktor_laser.inx in your inkscape extensions folder (/usr/share/inkscape/extensions/ on ubuntu).
+Based on the work of the Attraktor Hackerspace Laser Plugin
+(https://github.com/attraktorhh/inkscape_laserplugin).
 
-To create gcode select all objects that you want to laser, make sure they are paths by clicking on "Path/Object to Path" and export with "Extensions/Export/Attraktor Laser..."
+This repository is part of our Borries Marker Toolchain:
 
-The default values are OK for engraving. For cutting adjust the feedrate to 100-200 mm/minute depending on the material thickness.
+* [Marker API](https://github.com/freieslabor/borries-marker-api)
+* [Marker Web Control](https://github.com/freieslabor/MarkerWebControl)
+* Inkscape Marker Plugin (this repository)
 
-In order to have stuff lasered in the right order put them on separate layers. The layers on top of the layer list will be lasered first. If you want to override the feedrate for a layer name it in the following way: "LAYERNAME [feed=150]".
+License
+-------
 
-There is an additional plugin called eggbot_hatch from the eggbot project (http://egg-bot.com) included. It can put lines into closed paths - that way you can laser solid black or striped objects.
+GPLv2 or later. See license headers in source files.
+
+Install
+-------
+
+Put the ``attraktor_laser.py`` and ``attraktor_laser.inx`` in your inkscape
+extension folder.
+
+E.g. for Debian users: ~/.config/inkscape/extensions/
+
+How To Use
+----------
+
+To create gcode select all objects that you want to mark, make sure they are
+paths by clicking on "Path/Object to Path" and export with
+"Extensions/Export/Attraktor Laser..."
+
+Marking Order
+-------------
+
+In order to have stuff marked in the correct order put them on separate layers.
+The layers on top of the layer list will be marked first.
+
+Solid/Striped Objects
+---------------------
+
+There is an additional plugin called eggbot_hatch from the eggbot project
+(http://egg-bot.com) included. It can put lines into closed paths - that
+way you can laser solid black or striped objects.
