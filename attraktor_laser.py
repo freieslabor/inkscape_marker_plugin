@@ -792,7 +792,11 @@ class Gcode_tools(inkex.Effect):
                     #     self.make_args([None, None, s[5][0]+depth]) + feed \
                     #     + "\n" + LASER_ON
                     gcode += LASER_ON
-                gcode += "G01 " + self.make_args(si[0]) + feed + "\n"
+
+                # add line segments
+                for segment in self.split_linear(s[0], si[0]):
+                    gcode += "G01 " + self.make_args(segment) + feed + "\n"
+                    # FIXME: NEEDLE DOWN
                 lg = "G01"
 
             elif s[1] == "arc":
@@ -839,6 +843,36 @@ class Gcode_tools(inkex.Effect):
         if si[1] == "end":
             gcode += LASER_OFF
         return gcode
+
+    def split_linear(self, last_element, element, segment_length=1):
+        """
+        Converts a linear segment into multiple smaller linear segments. The
+        segment length gets cut in half over and over again until
+        segment_length is deceeded.
+        """
+
+        x0, y0 = last_element
+        x1, y1 = element
+
+        # FIXME: if start and end points of connected elements get marked ugly
+        # double marking happens
+
+        # add start and end as initial points
+        points = [last_element, element]
+
+        middle_x = (last_element[0] + element[0]) / 2
+        middle_y = (last_element[1] + element[1]) / 2
+        middle = (middle_x, middle_y)
+        length = math.sqrt((x0 - x1)**2 + (y0 - y1)**2)
+
+        if length > segment_length:
+            points += self.split_linear((x0, y0), middle, segment_length)
+            points.append(middle)
+            points += self.split_linear(middle, (x1, y1), segment_length)
+        else:
+            points.append(middle)
+
+        return points
 
     def tool_change(self):
         # Include a tool change operation
