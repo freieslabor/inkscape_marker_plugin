@@ -491,6 +491,8 @@ class Gcode_tools(inkex.Effect):
     def __init__(self):
         inkex.Effect.__init__(self)
 
+        self.marking_points = []
+
         outdir = os.getenv("HOME") or os.getenv("USERPROFILE")
         if (outdir):
             outdir = os.path.join(outdir, "Desktop")
@@ -774,12 +776,18 @@ class Gcode_tools(inkex.Effect):
                     gcode += LASER_ON
 
                 # add line segments
-                for segment in self.split_linear(s[0], si[0]):
-                    gcode += "G01 " + self.make_args(segment) + feed + "\n"
-                    # FIXME: NEEDLE DOWN
+                for point in self.split_linear(s[0], si[0]):
+                    self.add_marking_point(point)
+
+                for point in self.marking_points:
+                    gcode += "G01 " + self.make_args(point) + feed + "\n"
+                    # insert needle down
+                    gcode += "M300\n"
+
                 lg = "G01"
 
             elif s[1] == "arc":
+
                 if lg == "G00":
                     # gcode += "G01 " + \
                     #     self.make_args([None, None, s[5][0]+depth]) + feed \
@@ -853,6 +861,11 @@ class Gcode_tools(inkex.Effect):
             points.append(middle)
 
         return points
+
+    def add_marking_point(self, point):
+        """Adds a point to the marking list if not already added."""
+        if point not in self.marking_points:
+            self.marking_points.append(point)
 
     def tool_change(self):
         # Include a tool change operation
