@@ -279,7 +279,7 @@ def get_distance_from_csp_to_arc(sp1, sp2, arc1, arc2, tolerance=0.001):
     n = 10
     i = 0
     d = (0, (0, 0))
-    d1 = (0, (0, 0)), 0
+    d1 = (0, (0, 0))
     dl = 0
 
     while i < 1 or (abs(d1[0] - dl[0]) > tolerance and i < 2):
