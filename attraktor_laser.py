@@ -86,7 +86,7 @@ import bezmisc
 
 import os
 import math
-
+import logging
 
 # Constants
 
@@ -141,31 +141,11 @@ options = {}
 
 # Common functions
 
-
-class Logger(object):
-    """Just simple output function for better debugging."""
-    first = True
-    enabled = True
-
-    def __init__(self):
-        home = os.getenv("HOME") or os.getenv("USERPROFILE")
-        self.logpath = os.path.join(home, "thlaser.log")
-
-    def write(self, s):
-        if (not self.enabled):
-            return
-
-        if self.first and os.path.isfile(self.logpath):
-            os.remove(self.logpath)
-        self.first = False
-
-        f = open(self.logpath, "a")
-        f.write(str(s)+"\n")
-        f.close()
-
-# The global logger object
-logger = Logger()
-
+home = os.getenv("HOME") or os.getenv("USERPROFILE")
+logging.basicConfig(
+    filename=os.path.join(home, "thlaser.log"),
+    level=logging.DEBUG
+)
 
 class P:
     """
@@ -499,7 +479,7 @@ def parse_layer_name(txt):
                     raise ValueError("Invalid feed rate '%s'" % value)
 
             params[field] = value
-            logger.write("%s == %s" % (field, value))
+            logging.info("%s == %s" % (field, value))
 
     return (layerName, params)
 
@@ -917,7 +897,7 @@ class Gcode_tools(inkex.Effect):
                 for child in node.iterchildren():
                     path += compile_paths(child, trans)
                 return path
-            logger.write("skipping " + str(node.tag))
+            logging.info("skipping " + str(node.tag))
             self.skipped += 1
             return []
 
@@ -956,9 +936,9 @@ class Gcode_tools(inkex.Effect):
             # feed rate
             altfeed = layerParams.get("feed", None)
 
-            logger.write("layer %s" % layerName)
+            logging.info("layer %s" % layerName)
             if (layerParams):
-                logger.write("layer params == %s" % layerParams)
+                logging.info("layer params == %s" % layerParams)
             pathList = []
             # Apply the layer transform to all objects within the layer
             trans = layer.get("transform", None)
@@ -966,14 +946,14 @@ class Gcode_tools(inkex.Effect):
 
             for node in layer.iterchildren():
                 if (node in selected):
-                    logger.write("node %s" % str(node.tag))
+                    logging.info("node %s" % str(node.tag))
                     selected.remove(node)
                     pathList += compile_paths(node, trans)
                 else:
-                    logger.write("skipping node %s" % node)
+                    logging.info("skipping node %s" % node)
 
             if (not pathList):
-                logger.write("no objects in layer")
+                logging.info("no objects in layer")
                 continue
             curve = self.parse_curve(pathList)
 
@@ -1041,9 +1021,11 @@ class Gcode_tools(inkex.Effect):
             # Automatically append the correct extension
             self.filename += GCODE_EXTENSION
 
-        logger.enabled = self.options.logging
-        logger.write("thlaser script started")
-        logger.write("output file == %s" % self.options.file)
+        if not self.options.logging:
+            logging.disable(logging.CRITICAL)
+
+        logging.info("thlaser script started")
+        logging.info("output file == %s" % self.options.file)
 
         if len(selected) <= 0:
             inkex.errormsg(
@@ -1075,7 +1057,7 @@ class Gcode_tools(inkex.Effect):
             # Include a tool change operation
             gcode += self.tool_change()
 
-            logger.write("*** processing mirror image")
+            logging.info("*** processing mirror image")
 
             self.options.Yscale *= -1
             self.flipArcs = not(self.flipArcs)
