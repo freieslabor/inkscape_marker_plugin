@@ -394,6 +394,7 @@ def biarc(sp1, sp2, z1, z2, depth=0,):
     def calculate_arc_params(P0, P1, P2):
         D = (P0 + P2) / 2
         if (D - P1).mag() == 0:
+            logging.info("(D - P1).mag() == 0")
             return None, None
 
         R = D - ((D-P0).mag()**2 / (D - P1).mag()) * (P1 - D).unit()
@@ -407,6 +408,8 @@ def biarc(sp1, sp2, z1, z2, depth=0,):
 
         if abs(R.x) > 1000000 or abs(R.y) > 1000000 or \
                 (R - P0).mag < options.min_arc_radius:
+            logging.info("R.x = %f; R.y = %f" % (abs(R.x), abs(R.y)))
+            logging.info("abs(R.x) > 1000000 (%d) or abs(R.y) > 1000000 (%d) or (R - P0).mag < options.min_arc_radius (%d)" % (abs(R.x) > 1000000, abs(R.y) > 1000000, (R - P0).mag < options.min_arc_radius))
             return None, None
 
         else:
@@ -750,6 +753,7 @@ class Gcode_tools(inkex.Effect):
         # appended to the GCODE generation
         lg = "G00"
         for i in range(1, len(curve)):
+            logging.info(curve[i])
             s, si = curve[i-1], curve[i]
             # feed = f if lg not in ["G01","G02","G03"] else ""
 
@@ -757,6 +761,8 @@ class Gcode_tools(inkex.Effect):
                 feed = f
             else:
                 feed = ""
+
+            logging.info("type: %s" % s[1])
 
             if s[1] == "move":
                 # Traversals (G00) tend to signal either the toolhead coming
