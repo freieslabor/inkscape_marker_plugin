@@ -782,7 +782,7 @@ class Gcode_tools(inkex.Effect):
                     gcode += LASER_ON
 
                 # add line segments
-                for point in self.split_linear(s[0], si[0]):
+                for point in self.split_linear(s[0], s[4]):
                     self.add_marking_point(point)
 
                 for point in self.marking_points:
@@ -838,24 +838,24 @@ class Gcode_tools(inkex.Effect):
             gcode += LASER_OFF
         return gcode
 
-    def split_linear(self, last_element, element, segment_length=1):
+    def split_linear(self, start, end, segment_length=0.5):
         """
         Converts a linear segment into multiple smaller linear segments. The
         segment length gets cut in half over and over again until
         segment_length is deceeded.
         """
 
-        x0, y0 = last_element
-        x1, y1 = element
+        x0, y0 = start
+        x1, y1 = end
 
         # FIXME: if start and end points of connected elements get marked ugly
         # double marking happens
 
         # add start and end as initial points
-        points = [last_element, element]
+        points = [start, end]
 
-        middle_x = (last_element[0] + element[0]) / 2
-        middle_y = (last_element[1] + element[1]) / 2
+        middle_x = (x0 + x1) / 2
+        middle_y = (y0 + y1) / 2
         middle = (middle_x, middle_y)
         length = math.sqrt((x0 - x1)**2 + (y0 - y1)**2)
 
