@@ -26,10 +26,9 @@ extension folder. Also put the marker template in the templates directory.
 
 E.g. for Debian users:
 
-  ln -s /path/to/this/git/attraktor_laser.py ~/.config/inkscape/extensions/attraktor_laser.py
-  ln -s /path/to/this/git/attraktor_laser.inx ~/.config/inkscape/extensions/attraktor_laser.inx
-
-  ln -s /path/to/this/git/marker.svg ~/.config/inkscape/templates/marker.svg
+    ln -s /path/to/this/git/attraktor_laser.py ~/.config/inkscape/extensions/attraktor_laser.py
+    ln -s /path/to/this/git/attraktor_laser.inx ~/.config/inkscape/extensions/attraktor_laser.inx
+    ln -s /path/to/this/git/marker.svg ~/.config/inkscape/templates/marker.svg
 
 Set up Inkscape Workspace
 -------------------------
